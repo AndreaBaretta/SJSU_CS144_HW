@@ -1,0 +1,134 @@
+#ifndef HW2_BIGUINT_H
+#define HW2_BIGUINT_H
+#include <iostream>
+#include <cmath>
+using namespace std;
+class BigUInt {
+private:
+
+    // The length of the array data.
+    int length;
+    // Pointer to array. Each element of array contains a digit.
+    // Array length is equal to the number of digits of the BigUInt.
+    // data[0] contains the least significant digit.
+    // For example, if the BigUInt represents the number 385,
+    // then data[0] is 5, data[1] is 8, data[2] is 3, and length is 3.
+    unsigned char* data;
+
+public:
+    // 1. (1 point) Initializes the BigUInt to 0.
+    BigUInt() : length(1), data(new unsigned char[1]{0}) {}
+    // 2. (5 points) Initializes the BigUInt to n.
+    // Allocate data to an array the number of digits.
+    BigUInt(unsigned int n) {
+        if (n == 0) {
+            length = 1;
+        } else {
+            length = static_cast<int>(std::floor(std::log10(n))) + 1;
+        }
+        data = new unsigned char[length];
+
+        for (unsigned int i = 0; i < length; ++i) {
+            data[i] = n % 10;
+            n /= 10;
+        }
+    }
+    // 3. (1 point) Frees space in data.
+    ~BigUInt() {
+        delete[] data;
+    }
+    // 4. (1 point) Print the number represented by this BigUInt.
+    void Print() {
+        for (unsigned int i = 1; i <= length; ++i) {
+            std::cout << static_cast<unsigned int>(data[length-i]);
+        }
+        std::cout << std::endl;
+    }
+    // 5. (4 points) Set this BigUInt to original value times 10^p.
+    // Allocate space as neccessary.
+    void TimesTenPow(unsigned int p) {
+        unsigned char* new_data = new unsigned char[length + p];
+        for (unsigned int i = 0; i < p; ++i) {
+            new_data[i] = 0;
+        }
+        for (unsigned int i = 0; i < length; ++i) {
+            new_data[i + p] = data[i];
+        }
+        delete[] data;
+        data = new_data;
+        length += p;
+    }
+    // 6. (6 points) Set this BigUInt to original value plus rhs.
+    // Allocate space as necessary.
+    BigUInt &operator+=(const BigUInt &rhs) {
+        const unsigned int max = std::max(length, rhs.length);
+        const unsigned int min = std::min(length, rhs.length);
+
+        unsigned char* const sum = new unsigned char[max + 1];
+        bool carry = 0;
+        unsigned int i = 0;
+        for (; i < min; ++i) {
+            const unsigned char add = data[i] + rhs.data[i] + carry;
+            if (add > 9) {
+                sum[i] = add % 10;
+                carry = 1;
+            } else {
+                sum[i] = add;
+                carry = 0;
+            }
+        }
+        // const bool lhs_greater = length > rhs.length;
+        if (length > rhs.length) {
+            for (; i < max; ++i) {
+                const unsigned char add = data[i] + carry;
+                if (add > 9) {
+                    sum[i] = add % 10;
+                    carry = 1;
+                } else {
+                    sum[i] = add;
+                    carry = 0;
+                }
+            }
+        } else {
+            for (; i < max; ++i) {
+                const unsigned char add = rhs.data[i] + carry;
+                if (add > 9) {
+                    sum[i] = add % 10;
+                    carry = 1;
+                } else {
+                    sum[i] = add;
+                    carry = 0;
+                }
+            }
+        }
+        sum[max] = carry;
+        
+        if (sum[max] == 0) {
+            unsigned char* const smaller = new unsigned char[max];
+            for (unsigned int j = 0; j < max; ++j) {
+                smaller[j] = sum[j];
+            }
+            delete[] sum;
+            delete[] data;
+            data = smaller;
+            length = max;
+        } else {
+            delete[] data;
+            data = sum;
+            length = max + 1;
+        }
+
+        return *this;
+    }
+
+    // 7. (2 points) Print the number represented by this BigUInt.
+    friend ostream &operator<<(ostream &os, const BigUInt &b);
+};
+
+ostream &operator<<(ostream &os, const BigUInt &b) {
+    for (unsigned int i = 1; i <= b.length; ++i) {
+        os << static_cast<unsigned int>(b.data[b.length - i]);
+    }
+    return os;
+}
+#endif // HW2_BIGUINT_H
