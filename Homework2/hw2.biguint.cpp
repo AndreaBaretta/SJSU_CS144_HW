@@ -42,6 +42,10 @@ void BigUInt::Print()
 // Allocate space as neccessary.
 void BigUInt::TimesTenPow(unsigned int p)
 {
+    if (length == 1 && data[0] == 0)
+    {
+        return;
+    }
     unsigned char *new_data = new unsigned char[length + p];
     for (unsigned int i = 0; i < p; ++i)
     {
@@ -138,7 +142,7 @@ BigUInt &BigUInt::operator+=(const BigUInt &rhs)
     return *this;
 }
 
-ostream& operator<<(ostream &os, const BigUInt &b)
+ostream &operator<<(ostream &os, const BigUInt &b)
 {
     for (unsigned int i = 1; i <= b.length; ++i)
     {
