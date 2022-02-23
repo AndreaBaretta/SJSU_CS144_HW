@@ -1,11 +1,12 @@
-#include "hw2.biguint.hpp"
+#include "hw3.biguint.hpp"
 
 #include <cmath>
 #include <iostream>
-using namespace std;
+
+// HOMEWORK 2 METHODS
+
 BigUInt::BigUInt() : length(1), data(new unsigned char[1]{0}) {}
-// 2. (5 points) Initializes the BigUInt to n.
-// Allocate data to an array the number of digits.
+
 BigUInt::BigUInt(unsigned int n) {
     if (n == 0) {
         length = 1;
@@ -19,19 +20,18 @@ BigUInt::BigUInt(unsigned int n) {
         n /= 10;
     }
 }
-// 3. (1 point) Frees space in data.
+
 BigUInt::~BigUInt() {
     delete[] data;
 }
-// 4. (1 point) Print the number represented by this BigUInt.
+
 void BigUInt::Print() {
     for (unsigned int i = 1; i <= length; ++i) {
         std::cout << static_cast<unsigned int>(data[length - i]);
     }
     std::cout << std::endl;
 }
-// 5. (4 points) Set this BigUInt to original value times 10^p.
-// Allocate space as neccessary.
+
 void BigUInt::TimesTenPow(unsigned int p) {
     if (length == 1 && data[0] == 0) {
         return;
@@ -47,8 +47,7 @@ void BigUInt::TimesTenPow(unsigned int p) {
     data = new_data;
     length += p;
 }
-// 6. (6 points) Set this BigUInt to original value plus rhs.
-// Allocate space as necessary.
+
 BigUInt& BigUInt::operator+=(const BigUInt& rhs) {
     const unsigned int max = std::max(length, rhs.length);
     const unsigned int min = std::min(length, rhs.length);
@@ -66,7 +65,6 @@ BigUInt& BigUInt::operator+=(const BigUInt& rhs) {
             carry = 0;
         }
     }
-    // const bool lhs_greater = length > rhs.length;
     if (length > rhs.length) {
         for (; i < max; ++i) {
             const unsigned char add = data[i] + carry;
@@ -115,4 +113,74 @@ ostream& operator<<(ostream& os, const BigUInt& b) {
         os << static_cast<unsigned int>(b.data[b.length - i]);
     }
     return os;
+}
+
+// HOMEWORK 3 METHODS
+
+// (a) (2 points) Write copy constructor such that this->data is
+// pointing to different location as b.data.
+BigUInt::BigUInt(const BigUInt& b) : length(b.length), data(new unsigned char[length]) {
+    for (size_t i = 0; i < length; ++i) {
+        data[i] = b.data[i];
+    }
+}
+
+// (b) (2 points) Write assignment operator such that this->data is
+// pointing to different location as b.data.
+BigUInt& BigUInt::operator=(const BigUInt& b) {
+    length = b.length;
+    delete[] data;
+    data = new unsigned char[length];
+    for (size_t i = 0; i < length; ++i) {
+        data[i] = b.data[i];
+    }
+}
+
+// (c) (3 points) Write the += operator such that new value is equal
+// to old value + i.
+BigUInt& BigUInt::operator+=(unsigned int i) {
+    return (*this) += BigUInt(i);
+}
+
+// (d) (2 points) Implement SetDigit. This function sets the digit at
+// position i. It is set to d. Check that the input i is valid.
+// Check also that the input d is valid. If either input is invalid,
+// this function returns without doing anything.
+void BigUInt::SetDigit(int i, int d) {
+    if (i < 0 || i >= length) {
+        return;
+    }
+    if (d < 0 || d > 0) {
+        return;
+    }
+    data[i] = d;
+}
+
+// (e) (3 points) Return a string representing this unsigned integer.
+// For example, if the integer is 4892, then return a string "4892".
+string BigUInt::ToString() {
+    string str = string();
+    for (size_t i = 0; i < length; ++i) {
+        str.append(data[i], 1);
+    }
+    return str;
+}
+
+// (f) (4 points) Non-member friend function. Returns true of the value of
+// lhs is greater than rhs, returns false otherwise.
+bool operator>(const BigUInt& lhs, const BigUInt& rhs) {
+    if (lhs.length > rhs.length) {
+        return true;
+    } else if (lhs.length < rhs.length) {
+        return false;
+    } else {
+        return lhs.data[lhs.length - 1] > rhs.data[rhs.length - 1];
+    }
+}
+
+// (g) (4 points) Write a non-member function + that takes a BigUInt and an
+// unsigned int, and returns that BigUInt that represents their sum.
+BigUInt operator+(const BigUInt& b, unsigned int i) {
+    BigUInt b_copy(b);
+    return BigUInt(b_copy += i);
 }
