@@ -119,7 +119,7 @@ ostream& operator<<(ostream& os, const BigUInt& b) {
 
 // (a) (2 points) Write copy constructor such that this->data is
 // pointing to different location as b.data.
-BigUInt::BigUInt(const BigUInt& b) : length(b.length), data(new unsigned char[length]) {
+BigUInt::BigUInt(const BigUInt& b) : length(b.length), data(new unsigned char[b.length]) {
     for (size_t i = 0; i < length; ++i) {
         data[i] = b.data[i];
     }
@@ -134,6 +134,7 @@ BigUInt& BigUInt::operator=(const BigUInt& b) {
     for (size_t i = 0; i < length; ++i) {
         data[i] = b.data[i];
     }
+    return *this;
 }
 
 // (c) (3 points) Write the += operator such that new value is equal
@@ -160,8 +161,8 @@ void BigUInt::SetDigit(int i, int d) {
 // For example, if the integer is 4892, then return a string "4892".
 string BigUInt::ToString() {
     string str = string();
-    for (size_t i = 0; i < length; ++i) {
-        str.append(data[i], 1);
+    for (size_t i = 1; i <= length; ++i) {
+        str += to_string((unsigned int)data[length - i]);
     }
     return str;
 }
@@ -174,7 +175,10 @@ bool operator>(const BigUInt& lhs, const BigUInt& rhs) {
     } else if (lhs.length < rhs.length) {
         return false;
     } else {
-        return lhs.data[lhs.length - 1] > rhs.data[rhs.length - 1];
+        for (size_t i = lhs.length; i > 0; --i) {
+            if (lhs.data[i - 1] != rhs.data[i - 1]) return lhs.data[i - 1] > rhs.data[i - 1];
+        }
+        return false;
     }
 }
 
