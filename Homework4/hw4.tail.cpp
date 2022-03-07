@@ -29,7 +29,7 @@ struct ListNode {
 
 template <typename T>
 class List {
-   public:  // Make private
+   private:
     ListNode<T>* head;
     ListNode<T>* tail;
 
@@ -72,15 +72,13 @@ class List {
         if (head == nullptr || tail == nullptr) {  // List is of length 0
             return;
         }
-        if (head == tail && head->data == n) {  // List is of length 1 and that
-                                                // one object is the right one
+        if (head == tail && head->data == n) {  // List is of length 1 and that one object is the right one
             delete head;
             head = nullptr;
             tail = nullptr;
             return;
         }
-        if (head->data == n) {  // First element is the right one, so I don't
-                                // need to worry about previous node
+        if (head->data == n) {  // First element is the right one, so I don't need to worry about previous node
             ListNode<T>* tmp = head->next;
             delete head;
             head = tmp;
@@ -109,18 +107,6 @@ class List {
 };
 int main() {
     List<int> L;
-
-    // L.InsertFront(1);
-    // L.InsertFront(2);
-    // L.InsertFront(3);
-    // L.Print();
-    // L.InsertBack(4);
-    // L.Print();
-    // L.Remove(4);
-    // L.Print();
-    // L.InsertBack(17);
-    // L.Print();
-    // cout << L.tail->next << endl;
 
     L.Remove(2);
     L.Print();

@@ -3,9 +3,15 @@
 #include <iostream>
 using namespace std;
 // A Set contains ints with no duplicates.
+
 class Set {
+   private:
+    int* data;
+    int size;
+    int capacity;
+
    public:
-    Set() : data(nullptr), size(), capacity(0){};
+    Set() : data(nullptr), size(0), capacity(0) {};
     // (c) [3 points] Write a constructor that takes two arguments:
     // int arr[], which is an array of ints to put into data, and
     // int len, which is the length of arr.
@@ -15,16 +21,22 @@ class Set {
     // in data[].
     // size should be the number of ints data[] contains.
     // Initially, data should be null pointer, and capacity 0.
-    Set(int arr[], int len);
+    Set(int arr[], int len) : data(new int[len]), size(0), capacity(len) {
+        for (int i = 0; i < len; ++i) {
+            Insert(arr[i]);
+        }
+    }
     // (b) [2 points] Modify the Insert function to make sure that
     // we don't insert a value that already exists in the set.
     void Insert(int val) {
+        if (Exists(val)) return;
         if (capacity < size + 1) {
             DoubleCapacity();
         }
         data[size] = val;
         size++;
     };
+
     void DoubleCapacity() {
         int* old = data;
         data = new int[(capacity + 1) * 2];
@@ -36,7 +48,9 @@ class Set {
         capacity = (capacity + 1) * 2;
     };
     // (d) [1 points] Return that value at the given index.
-    int GetVal(int ind);
+    int GetVal(int ind) {
+        return data[ind];
+    }
 
     void Print() {
         for (int i = 0; i < size; i++) {
@@ -45,22 +59,55 @@ class Set {
         cout << endl;
     };
     // (e) [2 points] Swap the values of data[i] and data[j].
-    void Swap(int i, int j);
+    void Swap(int i, int j) {
+        if (0 <= i && 0 <= j && i < size && j < size) {
+            int val_i = data[i];
+            int val_j = data[j];
+            data[i] = val_j;
+            data[j] = val_i;
+        }
+    }
 
     int GetSize() { return size; };
     // (f) [2 points] Write the copy constructor. It is required that the data[]
     // for this object points to a different memory location as the data[] in
     // the copied object. Also, it is required to avoid memory leak.
+
+    Set(const Set& set) : data(new int[set.size]), size(set.size), capacity(set.size) {
+        for (int i = 0; i < set.size; ++i) {
+            data[i] = set.data[i];
+        }
+    }
+
     // (g) [2 points] Overload the assignment operator. Sane requirements as
     // copy constructor.
+    Set& operator=(const Set& set) {
+        delete[] data;
+        data = new int[set.size];
+        size = set.size;
+        capacity = set.size;
+        for (int i = 0; i < set.size; ++i) {
+            data[i] = set.data[i];
+        }
+        return *this;
+    }
+
     // (h) [2 points] Write the destructor. You must free memory so that there
     // is no memory leak.
+    ~Set() {
+        delete[] data;
+    }
+
    private:
     // (a) [2 points] Returns true if val is in data[], false otherwise.
-    bool Exists(int val);
-    int* data;
-    int capacity;
-    int size;
+    bool Exists(int val) {
+        for (int i = 0; i < size; ++i) {
+            if (data[i] == val) {
+                return true;
+            }
+        }
+        return false;
+    }
 };
 // OrderedSet is like a Set: It cannot contain duplicate values.
 // One additional property of OrderedSet: Its values are stored in order,
@@ -75,7 +122,16 @@ class OrderedSet : public Set {
     // OrderedSet remains in order, from smallest to biggest. First, put the new
     // value at the end of the array. Then, repeatedly swap backwards until it
     // finds its rightful position.
-    void Insert(int val);
+    void Insert(int val) {
+        Set::Insert(val);
+        for (int i = Set::GetSize() - 1; i > 0; --i) {
+            if (Set::GetVal(i - 1) > Set::GetVal(i)) {
+                Set::Swap(i - 1, i);
+            } else {
+                return;
+            }
+        }
+    }
 };
 int main() {
     int arr[6] = {1, 4, 7, 7, 2, 15};
