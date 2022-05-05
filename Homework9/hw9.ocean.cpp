@@ -1,6 +1,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <thread>
 #include "hw9.ocean.hpp"
 
 using namespace std;
@@ -29,8 +30,13 @@ Ocean::Ocean() : seas() {
 // Make sure no race conditions.
 // To use member variables in lambda expression, capture this.
 void Ocean::SimulateOneStep() {
+    vector<thread*> threads{};
     for (Sea* sptr : seas) {
-        sptr->SimulateOneStep();
+        threads.push_back(new thread([=](){sptr->SimulateOneStep();}));
+    }
+    for (thread* t : threads) {
+        t->join();
+        delete t;
     }
     for (Sea* sptr : seas) {
         for (int i = 0; i < SIZE; ++i) {
