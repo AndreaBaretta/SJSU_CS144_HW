@@ -26,24 +26,9 @@ void Sea::SimulateOneStep() {
         }
     }
     for (int i = 0; i < SIZE; ++i) {
-        for (int j = 0; j < right_buffer[i].size(); ++i) { // Fish better be outta there by now, or he's about to get merked
-            delete right_buffer[i][j];
-        }
         right_buffer[i].clear();
-
-        for (int j = 0; j < left_buffer[i].size(); ++i) {
-            delete left_buffer[i][j];
-        }
         left_buffer[i].clear();
-    
-        for (int j = 0; j < up_buffer[i].size(); ++i) {
-            delete up_buffer[i][j];
-        }
         up_buffer[i].clear();
-
-        for (int j = 0; j < down_buffer[i].size(); ++i) {
-            delete down_buffer[i][j];
-        }
         down_buffer[i].clear();
     }
     for (int i = 0; i < SIZE; i++) {
@@ -82,14 +67,14 @@ void Sea::SimulateOneStep() {
                 // } else {
                 //     temp_cells[ni][nj].push_back(fptr);
                 // }
-                if (ni < 0) {
-                    left_buffer[nj].push_back(fptr);
-                } else if (ni >= SIZE) {
-                    right_buffer[nj].push_back(fptr);
-                } else if (nj < 0) {
-                    up_buffer[ni].push_back(fptr);
+                if (nj < 0) {
+                    left_buffer[ni].push_back(fptr);
                 } else if (nj >= SIZE) {
-                    down_buffer[ni].push_back(fptr);
+                    right_buffer[ni].push_back(fptr);
+                } else if (ni < 0) {
+                    up_buffer[nj].push_back(fptr);
+                } else if (ni >= SIZE) {
+                    down_buffer[nj].push_back(fptr);
                 } else {
                     temp_cells[ni][nj].push_back(fptr);
                 }
